@@ -20,41 +20,8 @@ TARGET_CPU_ABI := x86
 TARGET_CPU_ABI2 := armeabi-v7a
 TARGET_CPU_ABI_LIST := x86,armeabi-v7a,armeabi
 TARGET_CPU_ABI_LIST_32_BIT := x86,armeabi-v7a,armeabi
-TARGET_KERNEL_CROSS_COMPILE_PREFIX := x86_64-linux-android-
 TARGET_BOARD_PLATFORM := clovertrail
 TARGET_BOOTLOADER_BOARD_NAME := clovertrail
-TARGET_USERIMAGES_USE_EXT4 := true
-TARGET_USERIMAGES_USE_F2FS := true
-TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS := true
-TARGET_OTA_ASSERT_DEVICE := Z00D,ASUS_Z00D
-
-# Specific headers
-TARGET_BOARD_KERNEL_HEADERS := device/asus/Z00D/kernel-headers
-TARGET_SPECIFIC_HEADER_PATH := device/asus/Z00D/include
-
-TARGET_DROIDBOOT_LIBS := libintel_droidboot
-
-TARGET_RELEASETOOL_MAKE_RECOVERY_PATCH_SCRIPT := ./device/asus/Z00D/make_recovery_patch
-
-# OTA Packaging / Bootimg creation
-BOARD_CUSTOM_MKBOOTIMG := pack_intel
-BOARD_CUSTOM_BOOTIMG_MK := device/asus/Z00D/mkbootimg.mk
-DEVICE_BASE_BOOT_IMAGE := device/asus/Z00D/base_images/boot.img
-DEVICE_BASE_RECOVERY_IMAGE := device/asus/Z00D/base_images/recovery.img
-
-# Inline kernel building
-TARGET_KERNEL_SOURCE := kernel/asus/Z00D
-TARGET_KERNEL_ARCH := x86
-BOARD_KERNEL_IMAGE_NAME := bzImage
-TARGET_KERNEL_CONFIG := lineageos_Z00D_defconfig
-
-BOARD_KERNEL_CMDLINE := init=/init pci=noearly console=ttyS0 console=logk0 earlyprintk=nologger bootup.uart=0 loglevel=8 kmemleak=off androidboot.bootmedia=sdcard androidboot.hardware=redhookbay watchdog.watchdog_thresh=60 androidboot.spid=xxxx:xxxx:xxxx:xxxx:xxxx:xxxx androidboot.serialno=01234567890123456789 ip=50.0.0.2:50.0.0.1::255.255.255.0::usb0:on vmalloc=172M
-
-TARGET_RECOVERY_UPDATER_LIBS += libosip_updater
-TARGET_RECOVERY_UPDATER_EXTRA_LIBS += libintel_updater liboempartitioning_static
-
-# Adb
-BOARD_FUNCTIONFS_HAS_SS_COUNT := true
 
 # Audio
 BOARD_USES_ALSA_AUDIO := true
@@ -69,29 +36,29 @@ BOARD_HAVE_BLUETOOTH := true
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/asus/Z00D/bluetooth
 
 # Camera
-INTEL_USE_CAMERA_UVC := true
 INTEL_VIDEO_XPROC_SHARING := true
 BOARD_GLOBAL_CFLAGS += -DCAMERA_VENDOR_L_COMPAT
 TARGET_PROVIDES_CAMERA_HAL := true
 TARGET_HAS_LEGACY_CAMERA_HAL1 := true
-
-ADDITIONAL_DEFAULT_PROPERTIES += \
-    media.stagefright.legacyencoder=true \
-    media.stagefright.less-secure=true
+TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS := true
 
 # Charger
 WITH_CM_CHARGER := false
 BOARD_CHARGER_ENABLE_SUSPEND := true
 BOARD_HEALTHD_CUSTOM_CHARGER_RES := device/asus/Z00D/charger/images
 
-# Dex-preoptimization: Speeds up initial boot (if we ever o a user build, which we don't)
+# Dex-preoptimization
 ifeq ($(HOST_OS),linux)
-  ifeq ($(TARGET_BUILD_VARIANT),user)
+  ifneq ($(TARGET_BUILD_VARIANT),eng)
     ifeq ($(WITH_DEXPREOPT),)
       WITH_DEXPREOPT := true
+      WITH_DEXPREOPT_BOOT_IMG_ONLY := true
     endif
   endif
 endif
+
+# DT2W
+TARGET_TAP_TO_WAKE_NODE := "/sys/bus/i2c/devices/i2c-0/0-0038/dclick_mode"
 
 # Hardware
 BOARD_HARDWARE_CLASS := device/asus/Z00D/cmhw
@@ -99,35 +66,25 @@ BOARD_HARDWARE_CLASS := device/asus/Z00D/cmhw
 # Healthd
 BOARD_HAL_STATIC_LIBRARIES := libhealthd.clovertrail
 
-# Houdini: enable ARM codegen for x86
-BUILD_ARM_FOR_X86 := true
+# Inline kernel building
+TARGET_KERNEL_CROSS_COMPILE_PREFIX := x86_64-linux-android-
+TARGET_KERNEL_SOURCE := kernel/asus/Z00D
+TARGET_KERNEL_ARCH := x86
+BOARD_KERNEL_IMAGE_NAME := bzImage
+TARGET_KERNEL_CONFIG := lineageos_Z00D_defconfig
+BOARD_KERNEL_CMDLINE := init=/init pci=noearly console=ttyS0 console=logk0 earlyprintk=nologger bootup.uart=0 loglevel=8 kmemleak=off androidboot.bootmedia=sdcard androidboot.hardware=redhookbay watchdog.watchdog_thresh=60 androidboot.spid=xxxx:xxxx:xxxx:xxxx:xxxx:xxxx androidboot.serialno=01234567890123456789 ip=50.0.0.2:50.0.0.1::255.255.255.0::usb0:on vmalloc=172M
 
 # IMG graphics
 BOARD_GLOBAL_CFLAGS += -DASUS_ZENFONE2_LP_BLOBS
 ENABLE_IMG_GRAPHICS := true
 HWUI_IMG_FBO_CACHE_OPTIM := true
-TARGET_INTEL_HWCOMPOSER_FORCE_ONLY_ONE_RGB_LAYER := true
 
 # IMG Graphics: System's VSYNC phase offsets in nanoseconds
 VSYNC_EVENT_PHASE_OFFSET_NS := 7500000
 SF_VSYNC_EVENT_PHASE_OFFSET_NS := 5000000
 
-# Opengles
-BOARD_GLOBAL_CFLAGS += -DFORCE_SCREENSHOT_CPU_PATH -DWORKAROUND_BUG_10194508
-BOARD_EGL_CFG := device/asus/Z00D/configs/egl.cfg
-
-ADDITIONAL_DEFAULT_PROPERTIES += \
-    ro.opengles.version = 131072
-
-INTEL_VA := true
-BUILD_WITH_FULL_STAGEFRIGHT := true
-BOARD_USES_VIDEO := true
-
 # enabled to carry out all drawing operations performed on a View's canvas with GPU for 2D rendering pipeline.
 USE_OPENGL_RENDERER := true
-
-# Disable an optimization that causes rendering issues for us
-TARGET_REQUIRES_SYNCHRONOUS_SETSURFACE := true
 
 # Init
 TARGET_INIT_VENDOR_LIB := libinit_ctp
@@ -138,17 +95,24 @@ TARGET_INIT_UMOUNT_AND_FSCK_IS_UNSAFE := true
 TARGET_PROVIDES_LIBLIGHT := true
 
 # Media
-TARGET_NUPLAYER_CANNOT_SET_SURFACE_WITHOUT_A_FLUSH := true
 BOARD_USES_WRS_OMXIL_CORE := true
 BOARD_USES_MRST_OMX := true
+INTEL_VA := true
+BUILD_WITH_FULL_STAGEFRIGHT := true
 
-# Media: DRM Protected Video
-BOARD_WIDEVINE_OEMCRYPTO_LEVEL := 1
-#USE_INTEL_SECURE_AVC := true
+# OTA assert
+TARGET_OTA_ASSERT_DEVICE := Z00D,ASUS_Z00D
 
-BOARD_GLOBAL_CFLAGS += -DGFX_BUF_EXT
+# OTA Packaging / Bootimg creation
+BOARD_CUSTOM_MKBOOTIMG := pack_intel
+BOARD_CUSTOM_BOOTIMG_MK := device/asus/Z00D/mkbootimg.mk
+DEVICE_BASE_BOOT_IMAGE := device/asus/Z00D/base_images/boot.img
+DEVICE_BASE_RECOVERY_IMAGE := device/asus/Z00D/base_images/recovery.img
+TARGET_RELEASETOOL_MAKE_RECOVERY_PATCH_SCRIPT := ./device/asus/Z00D/make_recovery_patch
 
 # Partitions
+TARGET_USERIMAGES_USE_EXT4 := true
+TARGET_USERIMAGES_USE_F2FS := true
 BOARD_BOOTIMAGE_PARTITION_SIZE := 16777216
 BOARD_RECOVERYIMAGE_PARTITION_SIZE := 1677721600
 BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
@@ -165,17 +129,16 @@ TARGET_NO_TWO_STEP_RECOVERY := true
 TARGET_RECOVERY_PIXEL_FORMAT := "BGRA_8888"
 BOARD_GLOBAL_CFLAGS += -DNO_SECURE_DISCARD
 TARGET_RECOVERY_FSTAB := device/asus/Z00D/rootdir/etc/fstab.redhookbay
+TARGET_RECOVERY_UPDATER_LIBS += libosip_updater
+TARGET_RECOVERY_UPDATER_EXTRA_LIBS += libintel_updater liboempartitioning_static
 TARGET_RECOVERY_DEVICE_MODULES := libinit_ctp librecovery_updater_ctp thermald upi_ug31xx
-
-# Security
-BUILD_WITH_SECURITY_FRAMEWORK := chaabi_token
-BUILD_WITH_CHAABI_SUPPORT := true
 
 # SELinux
 BOARD_SEPOLICY_DIRS += device/asus/Z00D/sepolicy
 
-# DT2W
-TARGET_TAP_TO_WAKE_NODE := "/sys/bus/i2c/devices/i2c-0/0-0038/dclick_mode"
+# Specific headers
+TARGET_BOARD_KERNEL_HEADERS := device/asus/Z00D/kernel-headers
+TARGET_SPECIFIC_HEADER_PATH := device/asus/Z00D/include
 
 # Wifi
 BOARD_WLAN_DEVICE           := bcmdhd
@@ -188,6 +151,6 @@ WIFI_DRIVER_FW_PATH_PARAM   := "/sys/module/bcmdhd/parameters/firmware_path"
 WIFI_DRIVER_FW_PATH_AP      := "/asusfw/wifi/fw_bcmdhd_apsta.bin"
 WIFI_DRIVER_FW_PATH_STA     := "/asusfw/wifi/fw_bcmdhd.bin"
 
-# Use the non-open-source parts, if they're present
--include vendor/asus/Z00D/BoardConfigVendor.mk
+# Use the non-open-source parts
+include vendor/asus/Z00D/BoardConfigVendor.mk
 

@@ -30,7 +30,6 @@ ADDITIONAL_DEFAULT_PROPERTIES += \
 
 # Audio
 PRODUCT_PACKAGES += \
-    libshim_audio \
     libtinycompress \
     libtinyalsa \
     audio.a2dp.default \
@@ -55,6 +54,10 @@ PRODUCT_PACKAGES += \
     camera.redhookbay \
     libshim_camera \
     Snap
+
+ADDITIONAL_DEFAULT_PROPERTIES += \
+    media.stagefright.legacyencoder=true \
+    media.stagefright.less-secure=true
 
 # Charger
 PRODUCT_PACKAGES += \
@@ -164,8 +167,7 @@ PRODUCT_PACKAGES += \
 
 # Radio
 PRODUCT_PACKAGES += \
-    libshim_mmgr \
-    libshim_tcs
+    libshim_icu
 
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.ril.status.polling.enable=0 \
@@ -204,10 +206,6 @@ PRODUCT_PACKAGES += \
 # Stlport
 PRODUCT_PACKAGES += \
     libstlport
-
-# Sensors
-PRODUCT_PACKAGES += \
-    libshim_sensors
 
 PRODUCT_COPY_FILES += \
     device/asus/Z00D/configs/sensor_hal_config_default.xml:system/etc/sensor_hal_config_default.xml \
@@ -260,7 +258,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     device/asus/Z00D/configs/wpa_supplicant_overlay.conf:system/etc/wifi/wpa_supplicant_overlay.conf
 
-$(call inherit-product-if-exists, vendor/asus/Z00D/Z00D-vendor.mk)
+$(call inherit-product, vendor/asus/Z00D/Z00D-vendor.mk)
 
 # Intel_updater
 PRODUCT_PACKAGES += \
@@ -273,6 +271,9 @@ PRODUCT_AAPT_PREF_CONFIG := xhdpi
 
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.sf.lcd_density=320
+
+ADDITIONAL_DEFAULT_PROPERTIES += \
+    ro.opengles.version = 131072
 
 # Ramdisk config of governors
 ADDITIONAL_DEFAULT_PROPERTIES += \
